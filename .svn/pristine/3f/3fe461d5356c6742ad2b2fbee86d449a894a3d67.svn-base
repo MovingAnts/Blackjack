@@ -1,0 +1,118 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Blackjack
+{
+    public enum OPERATION
+    {
+        addBet,
+        hit,
+        doubleStake,
+        stand,
+        deal,
+        checkIn,
+        notCheckIn
+    }
+
+    class Game
+    {
+
+        Player[] player;
+        Dealer dealer;
+        int[] card;
+        const int cardNum = 208;
+        int playerNum;
+        int currentPlayer;
+        int currentCard;
+        public Game(int playerNum,int initMoney)
+        {
+            player = new Player[playerNum];
+            this.playerNum = playerNum;
+            dealer = new Dealer();
+            card = new int[cardNum];
+            initCard();
+            currentCard = 0;
+            currentPlayer = 0;
+            for(int i = 0; i < playerNum; i++)
+            {
+                player[i] = new Player();
+                player[i].setMoney(initMoney);
+            }
+        }
+
+        /// <summary>
+        /// 将牌打乱
+        /// </summary>
+        public void initCard()
+        {
+            int[] result = new int[cardNum];
+            for (int i = 0; i < cardNum; i++)
+            {
+                result[i] = i + 1;
+            }
+            Random r = new Random();
+            int max = cardNum;//最大的索引位置
+            for (int j = 0; j < cardNum; j++)
+            {
+                //从0~最大的索引位置中取索引
+                int tmp = r.Next(0, max);
+                //将原数组的tmp位置的值替换成原数组中最后一个值
+                card[j] = result[tmp];
+                result[tmp] = result[max - 1];
+                max--;
+            }
+            dealer.hit(card[currentCard++]);
+            dealer.hit(card[currentCard++]);
+        }
+
+        public void display()
+        {
+
+        }
+
+        public bool operate(OPERATION operatoin,int money)
+        {
+            bool result = true;
+            switch (operatoin)
+            {
+                case OPERATION.addBet:result=player[currentPlayer++].addBet(money); break;
+                case OPERATION.hit:result=player[currentPlayer].hit(card[currentCard++]); break;
+                case OPERATION.doubleStake: result=player[currentPlayer].doubleStake(); break;
+                case OPERATION.stand:currentPlayer++;break;
+                case OPERATION.deal:
+                    if (player[currentPlayer].ifBlackJack())
+                    {
+                        if(dealer.getFirstCard()%52<=4&&dealer.getFirstCard()%52>=1)
+                        {
+                            result = false;
+                        }
+                        else
+                        {
+                            player[currentPlayer].setBlackJack(2);
+                            result = true;
+                        }
+                    }
+                    ; break;
+                case OPERATION.checkIn:player[currentPlayer].setBlackJack(1);break;
+                case OPERATION.notCheckIn:player[currentPlayer].setBlackJack(1.5);break;
+            }
+            return result;
+        }
+
+        public bool isOver()
+        {
+            if (currentPlayer == playerNum)
+            {
+                while (!dealer.over17())
+                {
+                    dealer.hit(card[currentCard++]);
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+}

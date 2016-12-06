@@ -1,0 +1,88 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Blackjack
+{
+    public partial class Form1 : Form
+    {
+        Game newGame;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        //点击开始游戏
+        public void start()
+        {
+            //获取游戏人数、初始金钱数，初始化游戏
+            newGame = new Game(5, 100);
+        }
+
+        /// <summary>
+        /// 前台点击hit按钮触发事件
+        /// </summary>
+        public void hit()
+        {
+            newGame.operate(OPERATION.hit,0);
+        }
+
+        /// <summary>
+        /// 前台点击stand按钮触发事件
+        /// </summary>
+        public void stand()
+        {
+            newGame.operate(OPERATION.stand, 0);
+        }
+
+        /// <summary>
+        /// 前台点击double按钮触发事件
+        /// </summary>
+        public void doubleStake()
+        {
+            newGame.operate(OPERATION.doubleStake, 0);
+        }
+
+        /// <summary>
+        /// 前台点击addBet按钮触发事件
+        /// </summary>
+        public void addBet()
+        {
+            int money = 10;
+            if(newGame.operate(OPERATION.addBet, money))
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// 前台点击deal按钮触发事件
+        /// </summary>
+        public void deal()
+        {
+            newGame.operate(OPERATION.deal, 0);
+        }
+
+        /// <summary>
+        /// 前台点击立即报道按钮触发事件
+        /// </summary>
+        public void checkIn()
+        {
+            newGame.operate(OPERATION.checkIn, 0);
+        }
+
+        /// <summary>
+        /// 前台点击不立即报道按钮触发事件
+        /// </summary>
+        public void notCheckIn()
+        {
+            newGame.operate(OPERATION.notCheckIn, 0);
+        }
+    }
+}

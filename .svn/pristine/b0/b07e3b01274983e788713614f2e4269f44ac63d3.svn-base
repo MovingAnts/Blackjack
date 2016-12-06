@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Blackjack
+{
+    class Dealer
+    {
+        int score;
+        List<int> cards;
+        int aNumber = 0;
+        int oneNumber = 0;
+        public bool hit(int card)//false为爆牌
+        {
+            cards.Add(card);
+            if (card > 1 && card < 11)
+                score += card;
+            else
+                if (card == 1)
+                {
+                    score += 11;
+                    aNumber++;
+                }
+                else score += 10;
+            if (score > 21)
+            {
+                if (aNumber > oneNumber)
+                {
+                    oneNumber++;
+                    score -= 10;
+                    if (score <= 21)
+                        return true;
+                }
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        public bool over17()
+        {
+            return score >= 17;
+        }
+        public int getFirstCard()
+        {
+            return cards[0];
+        }
+    }
+}

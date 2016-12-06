@@ -1,0 +1,195 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Text.RegularExpressions;
+
+namespace Blackjack
+{
+    public partial class Form1 : Form
+    {
+        Game newGame;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        /// <summary>
+        /// 下注按钮触发事件
+        /// </summary>
+        public void addBet(int money)
+        {
+            if (newGame.operate(OPERATION.addBet, money))
+            {
+                //UI类画图，减少正在进行的玩家相应money数、增加下注区的money数
+            }
+            else
+            {
+                //UI类画图，显示钱数不够的提示
+            }
+        }
+
+        /// <summary>
+        /// 前台点击不立即报道按钮触发事件
+        /// </summary>
+        public void notCheckIn()
+        {
+            newGame.operate(OPERATION.notCheckIn, 0);
+        }
+
+        private void button_5_Click(object sender, EventArgs e)
+        {
+            addBet(5);
+        }
+
+        private void button_10_Click(object sender, EventArgs e)
+        {
+            addBet(10);
+        }
+
+        private void button_25_Click(object sender, EventArgs e)
+        {
+            addBet(25);
+        }
+
+        private void button_100_Click(object sender, EventArgs e)
+        {
+            addBet(100);
+        }
+
+        private void button_deal_Click(object sender, EventArgs e)
+        {
+            if(!newGame.operate(OPERATION.deal, 0))
+            {
+                //UI类画图，显示牌框、询问玩家是否报道，显示是/否对话框
+            }else
+            {
+                if (newGame.ifCurrentPlayBlackjack())
+                {
+                    //UI类画图，显示黑杰克消息，并跳转到下一个玩家
+                }
+                else
+                {
+                    //UI类画图，显示hit、stand、double操作按钮
+                }
+            }
+        }
+
+        private void button_hit_Click(object sender, EventArgs e)
+        {
+            if(!newGame.operate(OPERATION.hit, 0))
+            {
+                //UI类画图，刷新牌区
+            }else
+            {
+                //UI类画图，显示爆牌信息，并跳转到下一个玩家
+            }
+        }
+
+        private void button_stand_Click(object sender, EventArgs e)
+        {
+            newGame.operate(OPERATION.stand, 0);
+            //UI类画图，跳转到下一个玩家
+        }
+
+        private void button_double_Click(object sender, EventArgs e)
+        {
+            if (!newGame.operate(OPERATION.doubleStake, 0))
+            {
+                //UI类画图，显示钱数不够信息
+            }else
+            {
+                if (!newGame.operate(OPERATION.hit, 0))
+                {
+                    //UI类画图，刷新牌区
+                }
+                else
+                {
+                    //UI类画图，显示爆牌信息，并跳转到下一个玩家
+                }
+            }
+        }
+
+        private void button_checkIn_Click(object sender, EventArgs e)
+        {
+            newGame.operate(OPERATION.checkIn, 0);
+            //UI类画图，更新画面，跳转到下一个玩家
+        }
+
+        private void button_notCheckIn_Click(object sender, EventArgs e)
+        {
+            newGame.operate(OPERATION.notCheckIn, 0);
+            //UI类画图，更新画面，跳转到下一个玩家
+        }
+
+        private void button_start_Click(object sender, EventArgs e)
+        {
+            int playerNum=0;
+            int money =0;
+            bool ifMoneyStandard = true;
+            bool ifPlayNumStandard = true;
+            Regex rex =new Regex(@"^\d+$");
+            if (rex.IsMatch(textbox_playerNum.Text))
+            {
+                playerNum = int.Parse(textbox_playerNum.Text);
+                if (playerNum < 1 || playerNum > 5)
+                {
+                    ifPlayNumStandard = false;
+                }
+            }else
+            {
+                ifPlayNumStandard = false;
+            }
+            if (rex.IsMatch(textbox_money.Text))
+            {
+                money = int.Parse(textbox_money.Text);
+                if (money < 5 || money > 1000)
+                {
+                    ifMoneyStandard = false;
+                }
+            }
+            else
+            {
+                ifMoneyStandard = false;
+            }
+            if(ifMoneyStandard == true&&ifPlayNumStandard==true)
+            {
+                newGame = new Game(playerNum,money );
+                button_10.Visible = true;
+                button_100.Visible = true;
+                button_5.Visible = true;
+                button_25.Visible = true;
+                button_deal.Visible = true;
+                label_currentPlayer.Visible = true;
+                label_currentMoney.Visible = true;
+                textbox_money.Visible = false;
+                textbox_playerNum.Visible = false;
+                label1.Visible = false;
+                label2.Visible = false;
+                playNumError.Visible = false;
+                moneyError.Visible = false;
+                button_start.Visible = false;
+                //UI类画图显示各控件按钮
+                label_currentPlayer.Text = "Player" + (newGame.CurrentPlayer + 1);
+                label_currentMoney.Text = "Money:" + (newGame.Player[newGame.CurrentPlayer].getMoney());
+            }
+            else
+            {
+                //UI类画图显示错误信息
+                if (ifMoneyStandard == false)
+                {
+                    moneyError.Text = "Invaild";
+                }
+                if (ifPlayNumStandard == false)
+                {
+                    playNumError.Text = "Invaild";
+                }
+            }
+        }
+    }
+}

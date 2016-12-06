@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Blackjack
+{
+    class Dealer
+    {
+        int score;
+        List<int> cards =new List<int>();
+        int aNumber = 0;
+        int oneNumber = 0;
+
+        public List<int> Cards
+        {
+            get
+            {
+                return cards;
+            }
+
+            set
+            {
+                cards = value;
+            }
+        }
+
+        public int Score
+        {
+            get
+            {
+                return score;
+            }
+
+            set
+            {
+                score = value;
+            }
+        }
+
+        public bool hit(int card)//false为爆牌
+        {
+            Cards.Add(card);
+            if (card > 1 && card < 11)
+                Score += card;
+            else
+                if (card == 1)
+                {
+                    Score += 11;
+                    aNumber++;
+                }
+                else Score += 10;
+            if (Score > 21)
+            {
+                if (aNumber > oneNumber)
+                {
+                    oneNumber++;
+                    Score -= 10;
+                    if (Score <= 21)
+                        return true;
+                }
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool over17()
+        {
+            return Score >= 17;
+        }
+        public int getFirstCard()
+        {
+            return Cards[0];
+        }
+    }
+}

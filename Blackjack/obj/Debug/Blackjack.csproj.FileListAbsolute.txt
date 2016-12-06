@@ -1,0 +1,9 @@
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\bin\Debug\Blackjack.exe.config
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\bin\Debug\Blackjack.exe
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\bin\Debug\Blackjack.pdb
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\obj\Debug\Blackjack.csprojResolveAssemblyReference.cache
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\obj\Debug\Blackjack.Form1.resources
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\obj\Debug\Blackjack.Properties.Resources.resources
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\obj\Debug\Blackjack.csproj.GenerateResource.Cache
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\obj\Debug\Blackjack.exe
+E:\university\subject\面向对象分析与设计\实验\Lab 03\Blackjack\Blackjack\obj\Debug\Blackjack.pdb

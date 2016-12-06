@@ -1,0 +1,322 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Text.RegularExpressions;
+
+namespace Blackjack
+{
+    public partial class Form1 : Form
+    {
+        Game newGame;
+        UI ui;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        /// <summary>
+        /// 下注按钮触发事件
+        /// </summary>
+        public void addBet(int money)
+        {
+            if (newGame.operate(OPERATION.addBet, money))
+            {
+                label_currentMoney.Text = "Money:"+ (newGame.Player[newGame.CurrentPlayer].Money-newGame.Player[newGame.CurrentPlayer].Bet).ToString();
+                label_betMoney.Text = (Convert.ToInt32(label_betMoney.Text) + money).ToString();
+                //UI类画图，减少正在进行的玩家相应money数、增加下注区的money数
+            }
+            else
+            {
+                label_betError.Text = "Not Enough";
+                //UI类画图，显示钱数不够的提示
+            }
+        }
+
+        /// <summary>
+        /// 前台点击不立即报道按钮触发事件
+        /// </summary>
+        public void notCheckIn()
+        {
+            newGame.operate(OPERATION.notCheckIn, 0);
+        }
+
+
+        /// <summary>
+        /// deal按钮触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_deal_Click(object sender, EventArgs e)
+        {
+            button_double.Visible = true;
+            button_hit.Visible = true;
+            button_stand.Visible = true;
+            button_5.Enabled = false;
+            button_25.Enabled = false;
+            button_10.Enabled = false;
+            button_100.Enabled = false;
+            button_deal.Enabled = false;
+            string control = "label_player" +(newGame.CurrentPlayer+1) + "Score";
+            string text= "Player" + (newGame.CurrentPlayer + 1) + ":" ;
+            if (!newGame.operate(OPERATION.deal, 0))
+            {
+                button_checkIn.Visible = true;
+                button_notCheckIn.Visible = true;
+                label_isCheckIn.Visible = true;
+                text =  text+"Blackjack!";         
+                //UI类画图，显示牌框、询问玩家是否报道，显示是/否对话框
+            }
+            else
+            {
+                if (newGame.ifCurrentPlayBlackjack())
+                {
+                    text = text+"Blackjack!";
+                    newGame.CurrentPlayer++;
+                    init();
+                }
+                else
+                {
+                    text = text+newGame.Player[newGame.CurrentPlayer].Score.ToString() + "点";
+                }
+            }
+            ui.showControl(control);
+            ui.showCard(newGame.CurrentPlayer + 1, 1);
+            ui.showCard(newGame.CurrentPlayer + 1, 2);
+            ui.WriteText(control, text);
+        }
+
+        /// <summary>
+        /// 跳转到下一个玩家，初始化界面
+        /// </summary>
+        private void init()
+        {
+            ui.initPlayer(); 
+            if (newGame.isOver())
+            {
+                //显示结果
+                ui.showResult();
+                return;
+            }
+        }
+
+        /// <summary>
+        /// hit按钮触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_hit_Click(object sender, EventArgs e)
+        {
+            bool result = newGame.operate(OPERATION.hit, 0);           
+            string control = "label_player" + (newGame.CurrentPlayer + 1) + "Score";
+            string text = "Player" + (newGame.CurrentPlayer + 1) + ":";
+
+            ui.showCard(newGame.CurrentPlayer + 1, newGame.Player[newGame.CurrentPlayer].Cards.Count);
+            //判断是否boom
+            if (result==true)
+            {
+                text = text+newGame.Player[newGame.CurrentPlayer].Score.ToString() + "点";
+                //判断是否21点
+                if (newGame.Player[newGame.CurrentPlayer].Score == 21)
+                {
+                    newGame.CurrentPlayer++;
+                    init();
+                }
+            }
+            else
+            {
+                text =text+ "boom";
+                newGame.CurrentPlayer++;
+                init();
+            }
+            //为控件control的Text属性赋值text
+            ui.WriteText(control, text);
+            //显示玩家i的第j张牌
+        }
+
+        /// <summary>
+        /// stand按钮触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_stand_Click(object sender, EventArgs e)
+        {
+            newGame.operate(OPERATION.stand, 0);
+            init();
+        }
+
+        /// <summary>
+        /// double按钮触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_double_Click(object sender, EventArgs e)
+        {
+            if (!newGame.operate(OPERATION.doubleStake, 0))
+            {
+                //UI类画图，显示钱数不够信息
+                ui.showControl("label_betError");
+                ui.WriteText("label_betError", "Not Enough");
+            }else
+            {
+                label_currentMoney.Text = "Money:" + (newGame.Player[newGame.CurrentPlayer].Money - newGame.Player[newGame.CurrentPlayer].Bet).ToString();
+                label_betMoney.Text = Convert.ToInt32(label_betMoney.Text).ToString();
+                //执行hit操作
+                bool result = newGame.operate(OPERATION.hit, 0);
+                string control = "label_player" + (newGame.CurrentPlayer + 1) + "Score";
+                string text = "Player" + (newGame.CurrentPlayer + 1) + ":";
+
+                ui.showCard(newGame.CurrentPlayer + 1, newGame.Player[newGame.CurrentPlayer].Cards.Count);
+                //判断是否boom
+                if (result == true)
+                {
+                    text = text + newGame.Player[newGame.CurrentPlayer].Score.ToString() + "点";
+                }
+                else
+                {
+                    text = text + "boom";
+                }
+                //为控件control的Text属性赋值text
+                ui.WriteText(control, text);
+                newGame.CurrentPlayer++;
+                init();
+            }
+        }
+
+
+
+        /// <summary>
+        /// checkIn触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_checkIn_Click(object sender, EventArgs e)
+        {
+            newGame.operate(OPERATION.checkIn, 0);
+            //UI类画图，更新画面，跳转到下一个玩家
+        }
+
+        /// <summary>
+        /// notCheckIn触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_notCheckIn_Click(object sender, EventArgs e)
+        {
+            newGame.operate(OPERATION.notCheckIn, 0);
+            //UI类画图，更新画面，跳转到下一个玩家
+        }
+
+        /// <summary>
+        /// 开始按钮触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_start_Click(object sender, EventArgs e)
+        {
+            int playerNum=0;
+            int money =0;
+            bool ifMoneyStandard = true;
+            bool ifPlayNumStandard = true;
+            Regex rex =new Regex(@"^\d+$");
+            //判断玩家人数是否合法
+            if (rex.IsMatch(textbox_playerNum.Text))
+            {
+                playerNum = int.Parse(textbox_playerNum.Text);
+                if (playerNum < 1 || playerNum > 5)
+                {
+                    ifPlayNumStandard = false;
+                }
+            }else
+            {
+                ifPlayNumStandard = false;
+            }
+            //判断金钱是否合法
+            if (rex.IsMatch(textbox_money.Text))
+            {
+                money = int.Parse(textbox_money.Text);
+                if (money < 5 || money > 1000)
+                {
+                    ifMoneyStandard = false;
+                }
+            }
+            else
+            {
+                ifMoneyStandard = false;
+            }
+            //金钱、玩家人数合法
+            if(ifMoneyStandard == true&&ifPlayNumStandard==true)
+            {
+                newGame = new Game(playerNum,money );
+                ui = new UI(newGame);
+                ui.startGame();
+            }
+            else
+            {
+                //UI类画图显示错误信息
+                if (ifMoneyStandard == false)
+                {
+                    ui = new UI(newGame);
+                    ui.WriteText("moneyError", "Invaild");
+                }
+                if (ifPlayNumStandard == false)
+                {
+                    ui = new UI(newGame);
+                    ui.WriteText("playNumError", "Invaild");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 5元砝码触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_5_Click(object sender, EventArgs e)
+        {
+            addBet(5);
+        }
+
+        /// <summary>
+        /// 10元砝码触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_10_Click(object sender, EventArgs e)
+        {
+            addBet(10);
+        }
+
+        /// <summary>
+        /// 25元砝码触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_25_Click(object sender, EventArgs e)
+        {
+            addBet(25);
+        }
+
+        /// <summary>
+        /// 100元砝码触发事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_100_Click(object sender, EventArgs e)
+        {
+            addBet(100);
+        }
+
+        private void button_goOn_Click(object sender, EventArgs e)
+        {
+            newGame.CurrentPlayer = 0;
+            newGame.init();
+            ui.startGame();
+        }
+    }
+}

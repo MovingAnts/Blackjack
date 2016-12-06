@@ -1,0 +1,133 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Blackjack
+{
+    public enum RESULT
+    {
+        LOSE,
+        WIN,
+        DRAW
+    }
+    class Player
+    {
+        List<int> cards;
+        double money;
+        int bet=0;
+        int score = 0;
+        int aNumber = 0;
+        int oneNumber=0;
+        double blackJact = 0;
+ 
+        public bool setMoney(int number)
+        {
+            if (number <= 0)
+                return false;
+            money = number;
+            return true;
+        }
+        public bool addBet(int b)//false为不够钱
+        {
+            if (bet + b > money)
+                return false;
+            else
+            {
+                bet += b;
+                return true;
+            }
+        }
+        public bool hit(int card)//false为爆牌
+        {
+            cards.Add(card);
+            if(card>1&&card<11)
+                score += card;
+            else
+                if(card==1)
+                {
+                    score+=11;
+                    aNumber++;
+                }
+                else score+=10;
+            if(score>21)
+            {
+                if (aNumber > oneNumber)
+                {
+                    oneNumber++;
+                    score -= 10;
+                    if(score<=21)
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        public bool ifBlackJack()
+        {
+            if (score == 21)
+                return true;
+            else
+                return false;
+        }
+        public void setBlackJack(double multiplying)
+        {
+            blackJact = multiplying;
+        }
+        public bool doubleStake()//false为钱不够
+        {
+            if(bet*2>money)
+            {
+                return false;
+            }
+            else
+            {
+                bet *= 2;
+                return true;
+            }
+        }
+        public RESULT compare(int s)//true为玩家赢，false为庄家赢
+        {
+            aNumber = 0;
+            oneNumber = 0;
+            if (blackJact == 1 || blackJact == 2||(blackJact==1.5&&s!=21))
+            {
+                money += bet * blackJact;
+                score = 0;
+                blackJact = 0;
+                return RESULT.WIN;
+            }
+            if(score<=21)
+            {
+                if (s > 21||s<score)
+                {
+                    money += bet;
+                    bet = 0;
+                    score = 0;
+                    return RESULT.WIN;
+                }
+                else
+                {
+                    if(s==score)
+                    {
+                        bet = 0;
+                        score = 0;
+                        return RESULT.DRAW;
+                    }
+                }
+            }
+            money -= bet;
+            bet = 0;
+            score = 0;
+            return RESULT.LOSE;
+        }
+        public double getMoney()//得到金钱数
+        {
+            return money;
+        }
+    }
+}
